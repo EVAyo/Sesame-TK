@@ -19,16 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import fansirsqi.xposed.sesame.entity.AlipayBeach;
 import fansirsqi.xposed.sesame.entity.AlipayUser;
 import fansirsqi.xposed.sesame.hook.Toast;
-import fansirsqi.xposed.sesame.model.BaseModel;
 import fansirsqi.xposed.sesame.model.ModelFields;
 import fansirsqi.xposed.sesame.model.ModelGroup;
 import fansirsqi.xposed.sesame.model.modelFieldExt.BooleanModelField;
 import fansirsqi.xposed.sesame.model.modelFieldExt.ChoiceModelField;
 import fansirsqi.xposed.sesame.model.modelFieldExt.SelectAndCountModelField;
 import fansirsqi.xposed.sesame.model.modelFieldExt.SelectModelField;
-import fansirsqi.xposed.sesame.newutil.DataStore;
+import fansirsqi.xposed.sesame.util.DataStore;
 import fansirsqi.xposed.sesame.task.ModelTask;
-import fansirsqi.xposed.sesame.task.TaskCommon;
 import fansirsqi.xposed.sesame.task.antFarm.TaskStatus;
 import fansirsqi.xposed.sesame.task.antForest.AntForestRpcCall;
 import fansirsqi.xposed.sesame.util.GlobalThreadPools;
@@ -120,19 +118,6 @@ public class AntOcean extends ModelTask {
         modelFields.addField(protectOceanList = new SelectAndCountModelField("protectOceanList", "保护 | 海洋列表", new LinkedHashMap<>(), AlipayBeach::getList));
         modelFields.addField(PDL_task = new BooleanModelField("PDL_task", "潘多拉任务", false));
         return modelFields;
-    }
-
-    @Override
-    public Boolean check() {
-        if (TaskCommon.IS_ENERGY_TIME) {
-            Log.record(TAG, "⏸ 当前为只收能量时间【" +  BaseModel.Companion.getEnergyTime().getValue()+ "】，停止执行" + getName() + "任务！");
-            return false;
-        } else if (TaskCommon.IS_MODULE_SLEEP_TIME) {
-            Log.record(TAG, "💤 模块休眠时间【" +  BaseModel.Companion.getModelSleepTime().getValue() + "】停止执行" + getName() + "任务！");
-            return false;
-        } else {
-            return true;
-        }
     }
 
     @Override

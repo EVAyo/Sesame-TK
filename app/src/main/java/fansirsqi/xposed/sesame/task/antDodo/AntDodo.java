@@ -7,22 +7,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import fansirsqi.xposed.sesame.entity.AlipayUser;
-import fansirsqi.xposed.sesame.model.BaseModel;
 import fansirsqi.xposed.sesame.model.ModelFields;
 import fansirsqi.xposed.sesame.model.ModelGroup;
 import fansirsqi.xposed.sesame.model.modelFieldExt.BooleanModelField;
 import fansirsqi.xposed.sesame.model.modelFieldExt.ChoiceModelField;
 import fansirsqi.xposed.sesame.model.modelFieldExt.SelectModelField;
-import fansirsqi.xposed.sesame.newutil.DataStore;
+import fansirsqi.xposed.sesame.util.DataStore;
 import fansirsqi.xposed.sesame.task.ModelTask;
-import fansirsqi.xposed.sesame.task.TaskCommon;
 import fansirsqi.xposed.sesame.task.antFarm.TaskStatus;
 import fansirsqi.xposed.sesame.util.GlobalThreadPools;
 import fansirsqi.xposed.sesame.util.Log;
@@ -79,18 +76,6 @@ public class AntDodo extends ModelTask {
         modelFields.addField(usePropUNIVERSALCARDType = new ChoiceModelField("usePropUNIVERSALCARDType", "万能卡 | 使用方式", UniversalCardUseType.EXCLUDE_CURRENT, UniversalCardUseType.nickNames));
         modelFields.addField(autoGenerateBook = new BooleanModelField("autoGenerateBook", "自动合成图鉴", false));
         return modelFields;
-    }
-    @Override
-    public Boolean check() {
-        if (TaskCommon.IS_ENERGY_TIME){
-            Log.record(TAG,"⏸ 当前为只收能量时间【"+ BaseModel.Companion.getEnergyTime().getValue() +"】，停止执行" + getName() + "任务！");
-            return false;
-        }else if (TaskCommon.IS_MODULE_SLEEP_TIME) {
-            Log.record(TAG,"💤 模块休眠时间【"+ BaseModel.Companion.getModelSleepTime().getValue() +"】停止执行" + getName() + "任务！");
-            return false;
-        } else {
-            return true;
-        }
     }
     @Override
     protected void runJava() {

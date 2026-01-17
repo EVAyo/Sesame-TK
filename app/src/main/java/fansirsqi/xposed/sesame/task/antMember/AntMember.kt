@@ -12,21 +12,19 @@ import fansirsqi.xposed.sesame.entity.MemberBenefit
 import fansirsqi.xposed.sesame.entity.SesameGift
 import fansirsqi.xposed.sesame.hook.internal.LocationHelper.requestLocationSuspend
 import fansirsqi.xposed.sesame.hook.internal.SecurityBodyHelper.getSecurityBodyData
-import fansirsqi.xposed.sesame.model.BaseModel.Companion.energyTime
-import fansirsqi.xposed.sesame.model.BaseModel.Companion.modelSleepTime
 import fansirsqi.xposed.sesame.model.ModelFields
 import fansirsqi.xposed.sesame.model.ModelGroup
 import fansirsqi.xposed.sesame.model.modelFieldExt.BooleanModelField
 import fansirsqi.xposed.sesame.model.modelFieldExt.SelectModelField
-import fansirsqi.xposed.sesame.newutil.TaskBlacklist.autoAddToBlacklist
+import fansirsqi.xposed.sesame.util.TaskBlacklist.autoAddToBlacklist
 import fansirsqi.xposed.sesame.task.ModelTask
-import fansirsqi.xposed.sesame.task.TaskCommon
 import fansirsqi.xposed.sesame.task.antOrchard.AntOrchardRpcCall.orchardSpreadManure
 import fansirsqi.xposed.sesame.util.CoroutineUtils
 import fansirsqi.xposed.sesame.util.GlobalThreadPools
 import fansirsqi.xposed.sesame.util.Log
 import fansirsqi.xposed.sesame.util.Log.record
 import fansirsqi.xposed.sesame.util.ResChecker
+import fansirsqi.xposed.sesame.util.TaskBlacklist
 import fansirsqi.xposed.sesame.util.TimeUtil
 import fansirsqi.xposed.sesame.util.maps.IdMapManager
 import fansirsqi.xposed.sesame.util.maps.MemberBenefitsMap
@@ -211,18 +209,6 @@ class AntMember : ModelTask() {
 
 
         return modelFields
-    }
-
-    override fun check(): Boolean {
-        if (TaskCommon.IS_ENERGY_TIME) {
-            record(TAG, "⏸ 当前为只收能量时间【" + energyTime.value + "】，停止执行" + name + "任务！")
-            return false
-        } else if (TaskCommon.IS_MODULE_SLEEP_TIME) {
-            record(TAG, "💤 模块休眠时间【" + modelSleepTime.value + "】停止执行" + name + "任务！")
-            return false
-        } else {
-            return true
-        }
     }
 
     override fun runJava() {
@@ -2691,7 +2677,7 @@ class AntMember : ModelTask() {
          * @return true表示在黑名单中，应该跳过
          */
         private fun isTaskInBlacklist(taskTitle: String?): Boolean {
-            return fansirsqi.xposed.sesame.newutil.TaskBlacklist.isTaskInBlacklist(taskTitle)
+            return TaskBlacklist.isTaskInBlacklist(taskTitle)
         }
 
         /**
@@ -2745,7 +2731,7 @@ class AntMember : ModelTask() {
 
 
                 if (task.has("actionUrl") && task.getString("actionUrl").contains("jumpAction")) {
-                    // 跳转APP任务 依赖跳转的APP发送请求鉴别任务完成 仅靠hook支付宝无法完成
+                    // 跳转APP任务 依赖跳转的APP发送请求鉴别任务完成 仅靠hook目标应用无法完成
                     record(TAG, "芝麻信用💳[跳过跳转APP任务]#$taskTitle")
                     skippedCount++
                     continue
@@ -2937,10 +2923,10 @@ class AntMember : ModelTask() {
                                     "JFLLRW_TASK" ->                   // 逛一逛得缴费红包
                                         taskReceive(taskCode, "JFLL_VIEWED", title)
 
-                                    "ZFBHYLLRW_TASK" ->                   // 逛一逛支付宝会员
+                                    "ZFBHYLLRW_TASK" ->                   // 逛一逛目标应用会员
                                         taskReceive(taskCode, "ZFBHYLL_VIEWED", title)
 
-                                    "QQKLLRW_TASK" ->                   // 逛一逛支付宝亲情卡
+                                    "QQKLLRW_TASK" ->                   // 逛一逛目标应用亲情卡
                                         taskReceive(taskCode, "QQKLL_VIEWED", title)
 
                                     "SSLLRW_TASK" ->                   // 逛逛领优惠得红包
